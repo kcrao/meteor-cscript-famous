@@ -68,6 +68,7 @@ Meteor.startup  ->
  
 # KRAO Added RenderController
       renderController= new Famous.RenderController
+      renderController2= new Famous.RenderController
 #create our surfaces 
 # create blue card surface
       blueCardSurface = new Famous.Surface
@@ -89,7 +90,6 @@ Meteor.startup  ->
           origin: [0.7, 0.5]
           align: [0.7, 0.5]
 
-          renderController.show(blueCardSurface)
 # add a transform to the modifier to do the rotation. note this is a transformFrom callback
 # so it gets evaluated 60 times a second. we will use our transitionable ('angled') to get the rotation angle
 # the rotate transform takes a value in 'radians' so we have to convert our 'degrees' to radians.
@@ -123,7 +123,7 @@ Meteor.startup  ->
       # the z value of 90 is to fix the safari bug (so box doesn't clip it)
       circleTranslateModifier = new Famous.Modifier
           transform: Famous.Transform.translate 0, 0, 90 
-   
+
 #create our click handler for the red card 
        blueCardSurface.on 'click', =>
             ###
@@ -139,7 +139,7 @@ Meteor.startup  ->
             @isToggled = ! @isToggled
             ###
             renderController.hide(blueCardSurface)
-            renderController.hide(circle)
+            renderController2.hide(circle)
             Router.go '/'    
             
  #build our render tree
@@ -148,8 +148,11 @@ Meteor.startup  ->
  # to our new view object when it gets created
       @add(blueCardRotationModifier).add(renderController).add blueCardSurface
  #chain the modifiers so the circle is both scaled and translated (z = 90)
-      @add(circleScaleModifier).add(circleTranslateModifier).add(circle).add renderController
+      @add(circleScaleModifier).add(circleTranslateModifier).add(renderController2).add circle
 
+
+      renderController.show(blueCardSurface)
+      renderController2.show(circle)
 
 Template.nBack.rendered = ->
 

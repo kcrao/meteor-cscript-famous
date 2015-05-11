@@ -14,6 +14,7 @@ Meteor.startup ->
   Famous.RenderController = famous.views.RenderController
   Famous.EventHandler = famous.core.EventHandler
  
+  Famous.ContainerSurface = famous.surfaces.ContainerSurface
   Famous.Scrollview = famous.views.Scrollview
   Famous.HeaderFooterLayout = famous.views.HeaderFooterLayout
  
@@ -70,10 +71,16 @@ Meteor.startup  ->
       @angled = new Famous.Transitionable defaultd
       @isToggled = false
   
-#KRAO Added Render Controller
+#KRAO Added Render Controller and Container Surface
+     # pageContainer=new Famous.ContainerSurface
+      #    size: size
+       #   origin: [0.5, 0.5]
+       #   align: [0.5,0.5]
 
       renderController = new Famous.RenderController
-
+      renderController2= new Famous.RenderController
+      pageView = new Famous.View
+    
  
 #create our surfaces 
 # create red card surface
@@ -96,7 +103,7 @@ Meteor.startup  ->
           origin: [0.5, 0.5]
           align: [0.5, 0.5]
  
-      renderController.show(redCardSurface)
+      #renderController.show(redCardSurface)
   
 # add a transform to the modifier to do the rotation. note this is a transformFrom callback
 # so it gets evaluated 60 times a second. we will use our transitionable ('angled') to get the rotation angle
@@ -130,10 +137,11 @@ Meteor.startup  ->
               return Famous.Transform.scale scale, scale
       # this is needed on order to keep the circle in front of the box
       # the z value of 90 is to fix the safari bug (so box doesn't clip it)
+
       circleTranslateModifier = new Famous.Modifier
           transform: Famous.Transform.translate 0, 0, 90 
+       
       
- 
 #create our click handler for the red card 
       redCardSurface.on 'click', =>
             ###
@@ -148,9 +156,9 @@ Meteor.startup  ->
             @angled.set targetAngle, { duration: 2000, curve: 'easeInOut' }
             @isToggled = ! @isToggled
             ###
+            renderController2.hide(circle)
             renderController.hide(redCardSurface)
-            renderController.hide(circle)
-       
+            #renderController.hide(pageView)     
             
             Router.go '/nBack'    
             
@@ -158,11 +166,21 @@ Meteor.startup  ->
  #  view -> modifier(s) -> surface
  # the '@' symbol means 'this.' so @add means this.add which adds the modifiers and surface 
  # to our new view object when it gets created
-      @add(redCardRotationModifier).add(renderController).add redCardSurface
+     
+      
+      
+      @add(redCardRotationModifier).add(renderController).add(pageView).add redCardSurface
  #chain the modifiers so the circle is both scaled and translated (z = 90)
-      @add(circleScaleModifier).add(circleTranslateModifier).add(circle).add renderController
+      
+      @add(circleScaleModifier).add(circleTranslateModifier).add(renderController2).add(pageView).add circle
 
 
+      
+      
+      renderController2.show(circle)
+      renderController.show(redCardSurface)        
+      
+     
 Template.home.rendered = ->
 
 # create our context for famo.us to use - the context will contain a single view that contains 
