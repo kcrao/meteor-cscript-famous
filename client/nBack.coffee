@@ -11,6 +11,7 @@ Meteor.startup ->
   Famous.StateModifier = famous.modifiers.StateModifier
   Famous.ModifierChain = famous.modifiers.ModifierChain
   Famous.RenderController = famous.views.RenderController
+  Famous.Flipper = famous.views.Flipper
   Famous.EventHandler = famous.core.EventHandler
  
   Famous.Scrollview = famous.views.Scrollview
@@ -67,92 +68,81 @@ Meteor.startup  ->
       @isToggled = false
  
 # KRAO Added RenderController
-      renderController= new Famous.RenderController
-      renderController2= new Famous.RenderController
-#create our surfaces 
-# create blue card surface
-      blueCardSurface = new Famous.Surface
-          size: size
-          content: 'Click Me'
-          properties:
-              fontSize: '26px'
-              paddingTop: '40px'
-              color: 'white'
-              textAlign: 'center'
-              backgroundColor: 'blue'
-              cursor: 'pointer'
-              border: 'solid 2px black'
-              borderRadius: '20px'
-# rotates red card surface
-# this is actually 4 modifiers in one (size,origin,align,and transform)
-      blueCardRotationModifier = new Famous.Modifier
-          size: size,
-          origin: [0.7, 0.5]
-          align: [0.7, 0.5]
+  
+      flipperView = new Famous.View
+      imageContent= '<img src="bart.svg" height="200" width="200">'
 
-# add a transform to the modifier to do the rotation. note this is a transformFrom callback
-# so it gets evaluated 60 times a second. we will use our transitionable ('angled') to get the rotation angle
-# the rotate transform takes a value in 'radians' so we have to convert our 'degrees' to radians.
-      blueCardRotationModifier.transformFrom =>
-          return Famous.Transform.rotateY @angled.get()*degtorad
- 
-# create our circle
-      circle = new Famous.Surface
-          size : [200, 200]
-          properties :
-              backgroundColor: 'white'
-              borderRadius: '100px'
-              pointerEvents : 'none'
-              textAlign: 'center'
-              paddingTop: '50px'
-              fontSize: 'x-large'
-              border: 'solid 2px green'
-# shows that we can render an HTML template into the surface content
-      circle.setContent Blaze.toHTML(Template.imacircle2)
- 
-#scales circle based on angle of rotation
-      circleScaleModifier = new Famous.Modifier
-          origin: [0.7, 0.5]
-          align: [0.7, 0.5]
-        # this is a callback so it is the same as a transformForm function executed 60 times a second
-          transform: =>
-              scale = Math.cos @angled.get()*degtorad
-              # we scale the X and Y sizes 
-              return Famous.Transform.scale scale, scale
-      # this is needed on order to keep the circle in front of the box
-      # the z value of 90 is to fix the safari bug (so box doesn't clip it)
-      circleTranslateModifier = new Famous.Modifier
-          transform: Famous.Transform.translate 0, 0, 90 
+      flipper = new Famous.Flipper
+      frontSurface = new Famous.Surface(
+        size: [
+          200
+          200
+        ]
+        content: imageContent
+        properties:
+          background: 'black'
+          color: 'white'
+          lineHeight: '200px'
+          textAlign: 'center')
 
-#create our click handler for the red card 
-       blueCardSurface.on 'click', =>
-            ###
-            if @isToggled is on
-              targetAngle = defaultd
-            else
-              targetAngle = -defaultd
-            # if the animation is currently in progress when box is clicked
-            # halt it and restart it (the direction will reverse)
-            if (@angled.isActive())
-              @angled.halt()
-            @angled.set targetAngle, { duration: 2000, curve: 'easeInOut' }
-            @isToggled = ! @isToggled
-            ###
-            renderController.hide(blueCardSurface)
-            renderController2.hide(circle)
-            Router.go '/'    
+      imageContent= '<img src="homer.svg" height="200" width="200">'
+
+
+      backSurface = new Famous.Surface(
+        size: [
+          200
+          200
+        ]
+        content: imageContent
+        properties:
+          background: 'black'
+          color: 'white'
+          lineHeight: '200px'
+          textAlign: 'center')
+
+      flipper.setFront frontSurface
+      flipper.setBack backSurface
+
+      centerModifier = new Famous.Modifier(
+        align: [
+          .5
+          .5
+        ]
+        origin: [
+          .5
+          .5
+        ])
+
+      toggle = false    
+      console.log ' made it past adds'
+
+      frontSurface.on 'click', =>
+        angle = if toggle then 0 else Math.PI
+        flipper.setAngle angle,
+          curve: 'easeOutBounce'
+          duration: 500
+        toggle = !toggle
+ 
+      backSurface.on 'click', =>
+        angle = if toggle then 0 else Math.PI
+        flipper.setAngle angle,
+          curve: 'easeOutBounce'
+          duration: 500
+        toggle = !toggle
+
+      @add(centerModifier).add(flipper)   
+      console.log 'past event'  
+
             
  #build our render tree
  #  view -> modifier(s) -> surface
  # the '@' symbol means 'this.' so @add means this.add which adds the modifiers and surface 
  # to our new view object when it gets created
-      @add(blueCardRotationModifier).add(renderController).add blueCardSurface
+ #      @add(blueCardRotationModifier).add(renderController).add blueCardSurface
  #chain the modifiers so the circle is both scaled and translated (z = 90)
-      @add(circleScaleModifier).add(circleTranslateModifier).add(renderController2).add circle
-
-
-      renderController.show(blueCardSurface)
-      renderController2.show(circle)
+ #     @add(circleScaleModifier).add(circleTranslateModifier).add(renderController2).add circle
+       
+      
 
 Template.nBack.rendered = ->
 
@@ -161,10 +151,10 @@ Template.nBack.rendered = ->
 # set the perspective so the rotation animation works
 
   nBack.mainContext = Famous.Engine.createContext()
-  nBack.mainContext.setPerspective 1000
+  nBack.mainContext.setPerspective 500
 
 # create a new instance of our app view that gets rendered into the context
   nBackViews = new nBack.modifier
  
 # add the view to the context to start the rendering and processing of our app by famo.us
-  nBack.mainContext.add nBackViews
+  nBack.mainContext.add nBackViews  
