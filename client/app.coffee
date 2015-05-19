@@ -1,58 +1,66 @@
 
 window.App ?= {}
 window.Famous ?={}
- 
-Meteor.startup ->  
+
+Meteor.startup ->
   Famous.Engine = famous.core.Engine
   Famous.View = famous.core.View
   Famous.Surface = famous.core.Surface
   Famous.Modifier = famous.core.Modifier
-  Famous.Transform = famous.core.Transform
+  Famous.Transform = famous.core.transform
   Famous.Draggable = famous.modifiers.Draggable
   Famous.StateModifier = famous.modifiers.StateModifier
   Famous.ModifierChain = famous.modifiers.ModifierChain
   Famous.RenderController = famous.views.RenderController
   Famous.EventHandler = famous.core.EventHandler
-  Famous.HeaderFooterLayout = famous.views.HeaderFooterLayout
- 
+
+
   Famous.ContainerSurface = famous.surfaces.ContainerSurface
   Famous.SequentialLayout = famous.views.SequentialLayout
+  Famous.HeaderFooterLayout = famous.views.HeaderFooterLayout
 
   Famous.Scrollview = famous.views.Scrollview
-  Famous.HeaderFooterLayout = famous.views.HeaderFooterLayout
- 
+
+
   Famous.Easing = famous.transitions.Easing
   Famous.Transitionable = famous.transitions.Transitionable
- 
+
   Famous.GenericSync     = famous.inputs.GenericSync
   Famous.MouseSync = famous.inputs.MouseSync
   Famous.TouchSync = famous.inputs.TouchSync
- 
- 
+
+
   Famous.Timer           = famous.utilities.Timer
- 
- 
- 
+
+
+
   Famous.Transitionable.registerMethod 'spring',famous.transitions.SpringTransition
- 
+
   Famous.GenericSync.register
     mouse: Famous.MouseSync
     touch: Famous.TouchSync
- 
+
+
+
+
 
 
 # define our 'home' path template for iron:router
- 
 
-Router.route 'clickBox',
+
+Router.route 'main',
     path: '/',
     template: 'home'
 
 
-
-Meteor.startup  -> 
+Meteor.startup  ->
 #creates a famous view
 # define our class in the App namespace
+  App.mainContext = Famous.Engine.createContext()
+  App.mainContext.setPerspective 1000
+
+
+
   class App.modifier extends Famous.View
     DEFAULT_OPTIONS:
       content: undefined
@@ -61,19 +69,19 @@ Meteor.startup  ->
       for key, val of @DEFAULT_OPTIONS
         @options[key] = @options[key] ? val
       @createPage()
- 
+
 #class methods follow
     createPage: ->
- 
+
 # static variables
       defaultd = -60
       degtorad = 0.0174533
       size = [300, 400]
-        
+
 # state variables
       @angled = new Famous.Transitionable defaultd
       @isToggled = false
-  
+
 #KRAO Added Render Controller and Container Surface
      # pageContainer=new Famous.ContainerSurface
       #    size: size
@@ -82,17 +90,18 @@ Meteor.startup  ->
 
       renderController = new Famous.RenderController
       renderController2= new Famous.RenderController
+      headerRenderController = new Famous.RenderController
       menuRenderController = new Famous.RenderController
       pageView = new Famous.View
-    
- 
-#create our surfaces 
+
+
+#create our surfaces
 
       sequentialLayout= new Famous.SequentialLayout
 
 #KRAO Create array of surfaces
 
-#      surfaces = 
+#      surfaces =
 #           first:
 #             name: "About"
 #              image: "question.png"
@@ -110,7 +119,7 @@ Meteor.startup  ->
       menuModifier = new Famous.Modifier
          transform: Famous.Transform.thenMove(famous.core.Transform.rotateZ(320.35), [2, 130, 0]),
          duration: 1200
-    
+
 
 
       sequentialLayout.sequenceFrom surfaces
@@ -120,7 +129,7 @@ Meteor.startup  ->
           'Play Game'
           'Settings'
       ]
-      
+
       for i in [0...4]
           surfaces.push new Famous.Surface(
             content: menuItems[i]
@@ -133,7 +142,7 @@ Meteor.startup  ->
               backgroundColor: '#47476B'
               lineHeight: window.innerHeight / 10 + 'px'
               textAlign: 'center')
-      
+
 
       surfaces[0].on 'click', =>
               alert "You clicked on Alert"
@@ -142,8 +151,8 @@ Meteor.startup  ->
       surfaces[2].on 'click', =>
               menuRenderController.hide(sequentialLayout)
               renderController2.hide(circle)
-              renderController.hide(redCardSurface)        
-              Router.go '/nBack'  
+              renderController.hide(redCardSurface)
+              Router.go '/nBack'
       surfaces[3].on 'click', =>
               alert "You clicked on Settings"
 # create red card surface
@@ -168,16 +177,16 @@ Meteor.startup  ->
           size: size,
           origin: [0.5, 0.5]
           align: [0.5, 0.5]
- 
+
       #renderController.show(redCardSurface)
-  
+
 # add a transform to the modifier to do the rotation. note this is a transformFrom callback
 # so it gets evaluated 60 times a second. we will use our transitionable ('angled') to get the rotation angle
 # the rotate transform takes a value in 'radians' so we have to convert our 'degrees' to radians.
       redCardRotationModifier.transformFrom =>
           return Famous.Transform.rotateY @angled.get()*degtorad
-     
-   
+
+
 # create our circle
       circle = new Famous.Surface
           size : [200, 200]
@@ -191,7 +200,7 @@ Meteor.startup  ->
               border: 'solid 2px green'
 # shows that we can render an HTML template into the surface content
       circle.setContent Blaze.toHTML(Template.imacircle)
- 
+
 #scales circle based on angle of rotation
       circleScaleModifier = new Famous.Modifier
           origin: [0.5, 0.5]
@@ -199,16 +208,16 @@ Meteor.startup  ->
         # this is a callback so it is the same as a transformForm function executed 60 times a second
           transform: =>
               scale = Math.cos @angled.get()*degtorad
-              # we scale the X and Y sizes 
+              # we scale the X and Y sizes
               return Famous.Transform.scale scale, scale
       # this is needed on order to keep the circle in front of the box
       # the z value of 90 is to fix the safari bug (so box doesn't clip it)
 
       circleTranslateModifier = new Famous.Modifier
-          transform: Famous.Transform.translate 0, 0, 90 
-       
-      
-#create our click handler for the red card 
+          transform: Famous.Transform.translate 0, 0, 90
+
+
+#create our click handler for the red card
       redCardSurface.on 'click', =>
             ###
             if @isToggled is on
@@ -224,41 +233,102 @@ Meteor.startup  ->
             ###
             renderController2.hide(circle)
             renderController.hide(redCardSurface)
-            #renderController.hide(pageView)     
-            
-            Router.go '/nBack'    
-            
+            #renderController.hide(pageView)
+
+            Router.go '/nBack'
+
  #build our render tree
  #  view -> modifier(s) -> surface
- # the '@' symbol means 'this.' so @add means this.add which adds the modifiers and surface 
+ # the '@' symbol means 'this.' so @add means this.add which adds the modifiers and surface
  # to our new view object when it gets created
-     
-      
-      
+
+
+
       @add(redCardRotationModifier).add(renderController).add(pageView).add redCardSurface
  #chain the modifiers so the circle is both scaled and translated (z = 90)
-      
+
       @add(circleScaleModifier).add(circleTranslateModifier).add(renderController2).add(pageView).add circle
 
       @add(menuModifier).add(menuRenderController).add(sequentialLayout)
-      
-      
+
+
       renderController2.show(circle)
       renderController.show(redCardSurface)
-      menuRenderController.show(sequentialLayout)        
-      
-     
+      menuRenderController.show(sequentialLayout)
+
+
+Template.layout.rendered = ->
+
+
+
+  buttonSurface = new Famous.Surface
+     size: [
+        50
+        50
+     ]
+     properties:
+        backgroundColor: '#262626'
+        marginTop: '10px'
+        marginLeft: '10px'
+
+  buttonSurface.setContent Blaze.toHTML(Template.homeButton)
+
+  containSurface = new Famous.ContainerSurface
+   size: [
+        undefined
+        70
+     ]
+   properties:
+         #backgroundColor: '#47476B'
+         backgroundColor: '#262626'
+         textAlign: 'center'
+
+
+  headerSurface = new Famous.Surface
+     size: [
+        undefined
+        70
+     ]
+     content: '<h2>Welcome to BrainBusters<h2>'
+     properties:
+         #backgroundColor: '#47476B'
+         backgroundColor: '#262626'
+         textAlign: 'center'
+
+  containSurface.add(buttonSurface)
+  #containSurface.add(headerSurface)
+
+  buttonSurface.on 'click', =>
+
+
+            #renderController2.hide(circle)
+            #renderController.hide(redCardSurface)
+            #renderController.hide(pageView)
+            currentRoute=Router.current()
+            window.flipRC.hide(window.flipper) ? window.flipRC
+            console.log currentRoute
+            Router.go '/'
+
+
+  App.mainContext.add containSurface
+
+Template.home.destroyed = ->
+#  hide famous flipper view before returning back to main menu
+   console.log 'destroyed fired off'
+
+
+
 Template.home.rendered = ->
 
-# create our context for famo.us to use - the context will contain a single view that contains 
+# create our context for famo.us to use - the context will contain a single view that contains
 # our entire render tree that defines our app
 # set the perspective so the rotation animation works
 
-  App.mainContext = Famous.Engine.createContext()
-  App.mainContext.setPerspective 1000
+  #App.mainContext = Famous.Engine.createContext()
+  #App.mainContext.setPerspective 1000
 
 # create a new instance of our app view that gets rendered into the context
   appViews = new App.modifier
 
 # add the view to the context to start the rendering and processing of our app by famo.us
-  App.mainContext.add appViews
+  App.mainContext.add(appViews)
