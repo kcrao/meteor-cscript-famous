@@ -312,9 +312,6 @@ Template.layout.rendered = ->
 
   App.mainContext.add containSurface
 
-Template.home.destroyed = ->
-#  hide famous flipper view before returning back to main menu
-   console.log 'destroyed fired off'
 
 
 

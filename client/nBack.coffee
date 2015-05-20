@@ -52,7 +52,7 @@ Meteor.startup  ->
   nBack.mainContext = Famous.Engine.createContext()
   nBack.mainContext.setPerspective 500
 
-#
+#Adding a comment la la la
 #creates a famous view
 # define our class in the nBack namespace
   class nBack.modifier extends Famous.View
@@ -66,7 +66,9 @@ Meteor.startup  ->
 
 #class methods follow
     createPage: ->
-
+      #gameArray = new Array
+      gameArray = window.populateArray()
+      console.log gameArray.length
 # static variables
       defaultd = -60
       degtorad = 0.0174533
