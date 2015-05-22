@@ -66,9 +66,10 @@ Meteor.startup  ->
 
 #class methods follow
     createPage: ->
-      #gameArray = new Array
-      gameArray = window.populateArray()
-      console.log gameArray.length
+      window.gameArray = new Array
+      window.populateArray(window.gameArray)
+      console.log 'your game array is this length'
+      console.log window.gameArray.length
 # static variables
       defaultd = -60
       degtorad = 0.0174533
@@ -83,22 +84,22 @@ Meteor.startup  ->
       window.flipper = new Famous.Flipper
       flipperView = new Famous.View
 
-      imageContent= '<img src="bart.svg" height="200" width="200">'
+      window.imageContent= '<img src="bart.svg" height="200" width="200">'
 
 
-      frontSurface = new Famous.Surface(
+      window.frontSurface = new Famous.Surface(
         size: [
           200
           200
         ]
-        content: imageContent
+        content: window.imageContent
         properties:
           background: 'black'
           color: 'white'
           lineHeight: '200px'
           textAlign: 'center')
 
-      imageContent= '<img src="homer.svg" height="200" width="200">'
+      window.imageContent= '<img src="homer.svg" height="200" width="200">'
 
 
       backSurface = new Famous.Surface(
@@ -106,15 +107,15 @@ Meteor.startup  ->
           200
           200
         ]
-        content: imageContent
+        content: window.imageContent
         properties:
           background: 'black'
           color: 'white'
           lineHeight: '200px'
           textAlign: 'center')
 
-      window.flipper.setFront frontSurface
-      window.flipper.setBack backSurface
+      flipper.setFront window.frontSurface
+      flipper.setBack backSurface
 
       centerModifier = new Famous.Modifier(
         align: [
@@ -129,6 +130,7 @@ Meteor.startup  ->
       toggle = false
       console.log ' made it past adds'
 
+      ###
       frontSurface.on 'click', =>
         angle = if toggle then 0 else Math.PI
         window.flipper.setAngle angle,
@@ -142,10 +144,31 @@ Meteor.startup  ->
           curve: 'easeOutBounce'
           duration: 500
         toggle = !toggle
+      ###
+      ###
+      timer= Famous.Timer
+      i = 0
 
+
+
+      while i <  window.gameArray.length
+
+        timer.debounce(swapImage(i),3000)
+
+
+        #backSurface.setContent(window.imageContent)
+        i++
+
+
+      timer.clear(swapImage(i))
+      ###
       window.flipRC.show(window.flipper)
       @add(centerModifier).add(window.flipRC).add(window.flipper)
       console.log 'past event'
+
+
+
+
 
 
  #build our render tree
@@ -155,6 +178,53 @@ Meteor.startup  ->
  #      @add(blueCardRotationModifier).add(renderController).add blueCardSurface
  #chain the modifiers so the circle is both scaled and translated (z = 90)
  #     @add(circleScaleModifier).add(circleTranslateModifier).add(renderController2).add circle
+
+swapImage =  ->
+       console.log 'swap index is '
+       console.log(window.i)
+       switch window.gameArray[window.i]
+         when 0
+           window.imageContent= '<img src="bart.svg" height="200" width="200">'
+         when 1
+           window.imageContent= '<img src="homer.svg" height="200" width="200">'
+         when 2
+           window.imageContent= '<img src="octocat.svg" height="200" width="200">'
+         when 3
+           window.imageContent= '<img src="homer.svg" height="200" width="200">'
+
+       console.log 'in swap and your image is '
+       console.log window.imageContent
+       window.frontSurface.setContent(window.imageContent)
+       console.log 'made it past setcontent'
+       window.i++
+       if window.i > window.gameArray.length
+           Meteor.clearInterval window.intervalID
+
+
+Template.genimage.helpers = ->
+   next_image: () ->
+     ###
+     timer= Famous.Timer
+     i = 0
+
+
+
+     while i <  window.gameArray.length
+       console.log 'in while loop'
+       timer.debounce(swapImage(i),3000)
+
+
+       #backSurface.setContent(window.imageContent)
+       i++
+
+
+     timer.clear(swapImage(i))
+     ###
+
+
+
+
+
 
 
 
@@ -171,5 +241,27 @@ Template.nBack.rendered = ->
 
 # create a new instance of our app view that gets rendered into the context
   nBackViews = new nBack.modifier
-# add the view to the context to start the rendering and processing of our app by famo.us
+# add the view to the   to start the rendering and processing of our app by famo.us
   nBack.mainContext.add nBackViews
+
+
+  #timer= Famous.Timer
+  window.i = 0
+
+  window.intervalID=0
+
+  window.intervalID=Meteor.setInterval(swapImage,300)
+
+  return
+  ###
+  while i <  window.gameArray.length
+    console.log 'in while loop'
+    window.frontSurface.setContent(window.imageContent)
+    timer.debounce(swapImage(i),300000)
+
+
+         #backSurface.setContent(window.imageContent)
+    i++
+  ###
+
+  #timer.clear(swapImage(i))

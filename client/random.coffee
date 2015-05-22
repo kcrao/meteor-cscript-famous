@@ -1,16 +1,17 @@
 #idxRandomImage = Math.floor(Math.round(2 * Math.random()))
 #
-window.populateArray = ->
+window.populateArray = (gameRound) ->
 
   console.log '_____brain_buster.dbg_____'
   matchCount = 0
-  gameRound = new Array
+
   #   for (i=0; i<20; i++) {
   while matchCount < 20 # paramterized
     if i > 0
-      Chunk = Math.floor(Math.round(3 * Math.random()))
+      Chunk = Math.floor(Math.round(10 * Math.random()))
       # %50 chance num 0 or 1
-      if Chunk <= 1
+      # if chunk =3 then there is a 40% chance of repeating for numbers 0-10
+      if Chunk <= 5
         gameRound[i] = gameRound[i - 1]
         # console.log( "{",Chunk,"}," , gameRound[i] );
       else
@@ -29,7 +30,7 @@ window.populateArray = ->
   n = gameRound.length
   console.log '_____brain_buster.dbg_____'
   console.log 'You needed an array sized at ' + n
-  return gameRound
+
 
 console.log 'devWidth := ' + devWidth
 devWidth = (devWidth - 185) / 2
