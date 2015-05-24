@@ -117,23 +117,31 @@ Meteor.startup  ->
  #             image: "playgame.png"
       surfaces=[]
 
+
       menuModifier = new Famous.Modifier
-         transform: Famous.Transform.thenMove(famous.core.Transform.rotateZ(320.40), [0, 95, 0]),
+         transform: Famous.Transform.thenMove(famous.core.Transform.rotateZ(320.40), [1, 95, 0]),
          #duration: 12000
 
 
 
       sequentialLayout.sequenceFrom surfaces
+
       menuItems = [
           'About'
           'LeaderBoard'
           'Play Game'
           'Settings'
       ]
+      iconItems = [
+           'about.png',
+           'friends.png',
+           'starred.png',
+           'settings.png'
+      ]
 
       for i in [0...4]
           surfaces.push new Famous.Surface(
-            content: menuItems[i]
+            content:  '<img src="' +iconItems[i] + '" height="15" width="15"> &nbsp; &nbsp;' +    menuItems[i]
             size: [
               390
               window.innerHeight / 11
@@ -143,7 +151,7 @@ Meteor.startup  ->
               backgroundColor: '#47476B'
               lineHeight: window.innerHeight / 10 + 'px'
               textAlign: 'center'
-              border: 'solid 1px white'
+              border: 'solid 1px black'
               borderRadius: '1px')
 
 
@@ -155,7 +163,7 @@ Meteor.startup  ->
 
               menuRenderController.hide(sequentialLayout)
 
-              
+              #menuLeftRenderController.hide(menuLeftSurface)
               renderController.hide(redCardSurface)
 
               Router.go '/nBack'
@@ -163,10 +171,10 @@ Meteor.startup  ->
               alert "You clicked on Settings"
 # create red card surface
       menuLeftModifier = new Famous.Modifier
-          transform: Famous.Transform.translate 0, 93, 0
+          transform: Famous.Transform.translate 1, 93, 0
 
       menuLeftSurface = new Famous.Surface
-          size: [40,307]
+          size: [41,307]
           properties:
               backgroundColor: 'black'
               borderRight: 'solid 1px black'
@@ -207,9 +215,9 @@ Meteor.startup  ->
 
 
       renderController.show(redCardSurface)
-      menuLeftRenderController.show(menuLeftSurface)
 
       menuRenderController.show(sequentialLayout)
+      menuLeftRenderController.show(menuLeftSurface)
 
 
 
