@@ -76,7 +76,7 @@ Meteor.startup  ->
 # static variables
       defaultd = -60
       degtorad = 0.0174533
-      size = [700, window.innerHeight-225]
+      size = [450, window.innerHeight-430]
 
 # state variables
       @angled = new Famous.Transitionable defaultd
@@ -119,7 +119,7 @@ Meteor.startup  ->
 
 
       menuModifier = new Famous.Modifier
-         transform: Famous.Transform.thenMove(famous.core.Transform.rotateZ(320.40), [1, 95, 0]),
+         transform: Famous.Transform.thenMove(famous.core.Transform.rotateZ(320.40), [0, 95, 0]),
          #duration: 12000
 
 
@@ -141,10 +141,10 @@ Meteor.startup  ->
 
       for i in [0...4]
           surfaces.push new Famous.Surface(
-            content:  '<img src="' +iconItems[i] + '" height="15" width="15"> &nbsp; &nbsp;' +    menuItems[i]
+            content:  '<img src="' +iconItems[i] + '" height="17" width="17"> &nbsp; &nbsp; &nbsp;' +    menuItems[i]
             size: [
-              390
-              window.innerHeight / 11
+              330
+              window.innerHeight / 12
             ]
             properties:
               #backgroundColor: '#ABD4ED'
@@ -174,7 +174,7 @@ Meteor.startup  ->
           transform: Famous.Transform.translate 1, 93, 0
 
       menuLeftSurface = new Famous.Surface
-          size: [41,307]
+          size: [35,307]
           properties:
               backgroundColor: 'black'
               borderRight: 'solid 1px black'
@@ -188,11 +188,11 @@ Meteor.startup  ->
           properties:
               fontSize: '26px'
               paddingTop: '20px'
-              color: 'white'
+              color: 'black'
               textAlign: 'center'
               backgroundColor: 'black'
               #cursor: 'pointer'
-              border: 'solid 1px white'
+              border: 'solid 1px black'
               #borderTop: 'solid 6px black'
               borderRadius: '2px'
 # rotates red card surface
@@ -201,7 +201,7 @@ Meteor.startup  ->
         #  size: size,
         #  origin: [0.54, 0.35]
         #  align: [0.54, 0.35]
-           transform: Famous.Transform.translate 370, 78, 0
+           transform: Famous.Transform.translate 330, 82, 0
 
 
 

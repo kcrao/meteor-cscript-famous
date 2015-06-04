@@ -84,7 +84,7 @@ Meteor.startup  ->
       window.flipper = new Famous.Flipper
       flipperView = new Famous.View
 
-      window.imageContent= '<img src="bart.svg" height="200" width="200">'
+      #window.imageContent= '<p>Image ' + window.i + ' of blah</p><img src="bart.svg" height="200" width="200">'
 
 
       window.frontSurface = new Famous.Surface(
@@ -94,12 +94,12 @@ Meteor.startup  ->
         ]
         content: window.imageContent
         properties:
-          background: 'black'
+          background: '#262626'
           color: 'white'
           lineHeight: '200px'
           textAlign: 'center')
 
-      window.imageContent= '<img src="homer.svg" height="200" width="200">'
+      #window.imageContent= '<p>Image ' + window.i + 'of blah</p><img src="homer.svg" height="200" width="200">'
 
 
       backSurface = new Famous.Surface(
@@ -109,7 +109,7 @@ Meteor.startup  ->
         ]
         content: window.imageContent
         properties:
-          background: 'black'
+          background: '#262626'
           color: 'white'
           lineHeight: '200px'
           textAlign: 'center')
@@ -124,7 +124,7 @@ Meteor.startup  ->
         ]
         origin: [
           .5
-          .5
+          .0
         ])
 
       toggle = false
@@ -181,16 +181,18 @@ Meteor.startup  ->
 
 swapImage =  ->
        console.log 'swap index is '
+       current= String(window.i+1)
+       total = String(window.gameArray.length)
        console.log(window.i)
        switch window.gameArray[window.i]
          when 0
-           window.imageContent= '<img src="bart.svg" height="200" width="200">'
+           window.imageContent= 'Image ' + current + ' of '  + total + '<img src="bart.svg" height="200" width="200">'
          when 1
-           window.imageContent= '<img src="homer.svg" height="200" width="200">'
+           window.imageContent= 'Image ' + current + ' of ' + total + '<img src="homer.svg" height="200" width="200">'
          when 2
-           window.imageContent= '<img src="octocat.svg" height="200" width="200">'
+           window.imageContent= 'Image ' + current + ' of ' + total + '<img src="octocat.svg" height="200" width="200">'
          when 3
-           window.imageContent= '<img src="homer.svg" height="200" width="200">'
+           window.imageContent= 'Image ' + current + ' of ' + total + '<img src="homer.svg" height="200" width="200">'
 
        console.log 'in swap and your image is '
        console.log window.imageContent
